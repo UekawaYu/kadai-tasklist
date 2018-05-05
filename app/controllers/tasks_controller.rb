@@ -1,11 +1,11 @@
-class MessagesController < ApplicationController
+class TasksController < ApplicationController
     
     def index
-        @task = Task.all
+        @tasks = Task.all
     end
 
     def show
-        @task = Taks.find(params[:id])
+        @task = Task.find(params[:id])
     end
 
     def new
@@ -13,7 +13,7 @@ class MessagesController < ApplicationController
     end
 
     def create
-    @mtask = Task.new(task_params)
+    @task = Task.new(task_params)
 
     if @task.save
       flash[:success] = 'Task が正常に登録されました'
