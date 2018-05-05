@@ -1,0 +1,60 @@
+class MessagesController < ApplicationController
+    
+    def index
+        @task = Task.all
+    end
+
+    def show
+        @task = Taks.find(params[:id])
+    end
+
+    def new
+    @task = Task.new
+    end
+
+    def create
+    @mtask = Task.new(task_params)
+
+    if @task.save
+      flash[:success] = 'Task が正常に登録されました'
+      redirect_to @task
+    else
+      flash.now[:danger] = 'Task が登録されませんでした'
+      render :new
+    end
+    end
+
+def edit
+    @task= Task.find(params[:id])
+end
+  
+def update
+    @task = Task.find(params[:id])
+
+    if @task.update(task_params)
+      flash[:success] = 'Task は正常に登録されました'
+      redirect_to @task
+    else
+      flash.now[:danger] = 'Task は登録されませんでした'
+      render :edit
+    end
+end
+
+def destroy
+    @task = Task.find(params[:id])
+    @task.destroy
+
+    flash[:success] = 'Task は正常に登録されました'
+    redirect_to tasks_url
+end
+
+
+private
+
+# Strong Parameter
+
+def task_params
+  params.require(:task).permit(:content)
+end
+
+end
