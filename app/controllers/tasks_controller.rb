@@ -1,56 +1,60 @@
 class TasksController < ApplicationController
-  before_action :set_task, only: [:show, :edit, :update, :destroy]
+  before_action :require_user_logged_in
+  before_action :correct_user, only: [:destroy]
+#before_action :set_task, only: [:show, :edit, :update, :destroy]
     
-    def index
-        @tasks = Task.all.page(params[:page])
-    end
+#   def index
+#        @tasks = Task.all.page(params[:page])
+#    end
+#
+#    def show
+#    end
 
-    def show
-    end
+#    def new
+#    @task = Task.new
+#    end
 
-    def new
-    @task = Task.new
-    end
-
-    def create
-    @task = Task.new(task_params)
-
+  def create
+    @task = current_user.tasks.build(task_params)
     if @task.save
-      flash[:success] = 'Task が正常に登録されました'
-      redirect_to @task
+      flash[:success] = 'タスクを登録しました。'
+      redirect_to root_url
     else
-      flash.now[:danger] = 'Task が登録されませんでした'
-      render :new
+      @tasks = current_user.tasks.order('created_at DESC').page(params[:page])
+      flash.now[:danger] = 'タスクの登録に失敗しました。'
+      render 'toppages/index'
     end
-    end
+  end
 
-def edit
-end
+
+
+#def edit
+#end
   
-def update
+#def update
+#
+#    if @task.update(task_params)
+#      flash[:success] = 'Task は正常に登録されました'
+#      redirect_to @task
+#    else
+#      flash.now[:danger] = 'Task は登録されませんでした'
+#      render :edit
+#    end
+#end
 
-    if @task.update(task_params)
-      flash[:success] = 'Task は正常に登録されました'
-      redirect_to @task
-    else
-      flash.now[:danger] = 'Task は登録されませんでした'
-      render :edit
-    end
-end
-
-def destroy
+  def destroy
     @task.destroy
+    flash[:success] = 'タスクを削除しました。'
+    redirect_back(fallback_location: root_path)
+  end
 
-    flash[:success] = 'Task は正常に登録されました'
-    redirect_to tasks_url
-end
 
 
 private
 
-  def set_task
-    @task = Task.find(params[:id])
-  end
+#  def set_task
+#    @task = Task.find(params[:id])
+#  end
 
 # Strong Parameter
 
@@ -58,4 +62,10 @@ def task_params
   params.require(:task).permit(:content, :status)
 end
 
+def correct_user
+    @task = current_user.tasks.find_by(id: params[:id])
+    unless @task
+      redirect_to root_url
+    end
+  end
 end
